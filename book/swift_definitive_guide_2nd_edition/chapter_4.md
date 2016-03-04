@@ -20,13 +20,13 @@ a = nil // エラーとなる
 * オプショナル型を使うことでNullPointerExceptionを避けることを期待している
 * オプショナル型は、データ型のイニシャライザの返り値にも使われる
 
-```文字列を引数とするイニシャライザの例
+```swift:文字列を引数とするイニシャライザの例
 let olympic = "2020"
 var year : Int? = Int(olympic) // 2020が返される
 var city : Int? = Int("Tokyo") // 整数と評価されず、nilが返される
 ```
 
-```パラーメータ付き型指定を使ったオプショナル型
+```swift:パラーメータ付き型指定を使ったオプショナル型
 var year : Optional<Int> = Int("2020")
 ```
 
