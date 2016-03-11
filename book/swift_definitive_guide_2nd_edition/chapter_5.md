@@ -21,7 +21,7 @@
 ```
 Int.init()
 Int.init(_: Double)
-Int.init(_* Float)
+Int.init(_: Float)
 ```
 
 * Double型の値をInt型に変換
