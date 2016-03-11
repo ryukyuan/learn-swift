@@ -53,7 +53,7 @@ var remain : Int = year! - 2016 // 開示が必要
 ```
 var nagano : Int? = Int("1998")
 if nagano != nil {
-    print("Nagano: \(nagano!)") // ここでは開示していが必要
+    print("Nagano: \(nagano!)") // ここでは開示指定が必要
 }
 ```
 
@@ -61,9 +61,9 @@ if nagano != nil {
 
 ```
 var x : Int? = 1964
-x > 2000 // falseが変える
+x > 2000 // falseが返る
 x = nil
-x < 2000 // trueが変える
+x < 2000 // trueが返る
 ```
 
 ## 4.2 オプショナル束縛構文
