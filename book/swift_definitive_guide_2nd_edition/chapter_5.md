@@ -57,8 +57,8 @@ var rg: Range<Int>(start:0, end:10)
 ```
 var sintv = "archer" ... "saber" // 文字列型の区間
 if sintv ~= "lancer" { print("yes") }  // true: "yes"を印字
-  var rg: Range<Int> = -5...5 // 整数型の範囲
-  if rg ~= 9 { print("yes") } /// false: 印字しない
+var rg: Range<Int> = -5...5 // 整数型の範囲
+if rg ~= 9 { print("yes") } /// false: 印字しない
 ```
 
 * 範囲型のインスタンスはfor-in文で使えるが、区間型は使うことができない
