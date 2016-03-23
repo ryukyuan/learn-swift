@@ -91,6 +91,115 @@ enum 型名 : 実体型 {
 }
 ```
 
+* 実態数が整数の場合、リテラで値を指定しなかったメンバは、１つ前のメンバの値に１を加えたものになる
+* 先頭のリテラルに値がない場合は値は0となる
+* メンバの中に同じ値を持つものがないようにしなければならない
+* 実体型が文字列で、リテラルを指定しない場合、メンバの文字列が実体型の値になる
+* 整数、文字列以外の型が実体型の場合、各メンバに対して必ずリテラルを記述し、それぞれが異なるようにする
+
+```
+enum Direction : Int {
+   case Up = 0, Down, Right, Left
+}
+```
+
+* 最初のUpの実体値を0にしたので、それ以降のDown、Right、Leftはそれぞれ1、2、3を値に持つことになる
+* それぞれが持つ実体値を取り出すためにrawValueというプロパティを使うことができる
+
+```
+let a = Direction.Right
+let i = a.rawValue // i = 2 (Int)
+let k = Direction.Down.rawValue // k = 1 (Int)
+```
+
+* 実体型の値からそれに対応する列挙型のインスタンスを得るには、rawValueというキーワードの引数を１つもつイニシャライザを使う
+* 実体型の値に対応する列挙型がない場合は、列挙型のオプショナル型になる
+
+```
+let b : Direction? = Direction(rawValue:3)
+b! == Dreciton.Left // true
+if let c = Direction(rawValue:2) { // オプショナル束縛構文
+    print("OK \(c.rawValue)") // "OK 2"
+}
+```
+
+* 値型の列挙型を用いてDirecitonの列挙型を書き直す
+
+```
+enum Direction : Int {
+    case Up = 0, Right, Down, Left
+    func clockwise() -> Direction {
+        let t = (self.rawValue + 1) % 4 // selfはインスタンス自体
+        return Direction(rawValue:t)! // nilにはならない
+    }
+}
+```
+
+### 列挙型に対するメソッドとプロパティ
+
+* 列挙型に定義できるプロパティは計算型のプロパティのみ
+
+```
+enum Direction : Int {
+    case Up = 0, Right, Down, Left
+/* ... 中略 ... */
+    var horizontal : Bool {
+        switch self {
+        case Right, Left: return true
+        default: return false
+        }
+    }
+    mutating func turnBack() {
+        self = Direction(rawValue:((self.rawValue + 2) % 4))!
+    }
+}
+```
+
+* 値が右か左かを表す計算型プロパティのhorizontalを定義
+* 値の正反対方向に反転するメソッドturnVackをmutating属性を持つメソッドとして定義することで列挙型自体の値を変更している
+
+```
+var d = Direction.Left
+print(d.rawValue) // 3が出力される
+d.turnBack
+print(d.rawValue) // 1が出力される（3の反対方向）
+print(d.horizontal) // trueが出力される
+```
+
+
+### 列挙型のタイプメソッド
+
+* 列挙型にも、構造体と同様にタイプメソッド、タイププロパティ、イニシャライザを定義することができる
+* タイプメソッドとタイププロパティは、先頭にキーワードstaticを記述する
+* イニシャライザではselfに何を代入するかを定義することになる
+
+```
+enum Direction : Int {
+    case Up, Right, Down. Left
+    static var defaultDirection = Direction.Up
+    init() {
+        self = Direction.defaultDirection
+    }
+    static func arrow(d:Direction) -> String {
+        return["↑", "→", "↓", "←"][d.rawValue]
+    }
+}
+```
+
+* イニシャライザinit()を使ってインスタンスを静止したあと、Direction.defaultValueを使い、値を初期化している
+* タイプメソッドとしてインスタンスに対応する向きを持つ矢印を返すarrowというメソッドを定義している
+
+```
+Direction.defaultDireciton = .Right // 右向きを初期値にする
+var e = Dirreciont() // イニシャライザを使う
+print(Direciont.arrow(e)) // "→"を出力
+```
+
+
+
+
+
+
 
 
 
