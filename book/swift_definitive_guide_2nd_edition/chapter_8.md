@@ -34,7 +34,7 @@ class DayOfMonth : CustomStringConvertible {
   init(month:Int, day:Int) {
     self.month = month; self.day = day
   }
-  var description: Strint {
+  var description: String {
     return DayOfMonth.towDigits(month)
       + "/" + DayOfMonth.towDigits(day)
   }
