@@ -47,7 +47,7 @@ class DayOfMonth : CustomStringConvertible {
 ```
 
 * ベースクラスとして使うDayOfMonth
-* 月と火で日付を表すクラスで、イニシャライザはごく普通のもの
+* 月と日で日付を表すクラスで、イニシャライザはごく普通のもの
 * print表示ができるようにプロトコルCustomStringConvertibleを採用し、プロパティ descriptionを定義
 * twoDigitsは整数を2桁で表すもの
 
