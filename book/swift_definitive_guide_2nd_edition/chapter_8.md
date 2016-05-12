@@ -137,3 +137,58 @@ class DateW: Date {
 * 後述する遅延格納型プロパティが役立つかもしれない
 * ただし、定数には適用できない
 
+## 8.3  継承とサブクラス定義
+
+### 継承とプロパティオブザーバ
+
+* クラスはプロパティオブザーバを定義し、継承できる
+* サブクラスではスーパークラスで定義したプロパティを監視することができる
+* 監視対象のプロパティは格納型プロパティだけではなく、計算型プロパティも可能
+* ただし、読み取り専用のプロパティは監視できない
+* 同じクラスで定義されている計算型プロパティのset節を監視することもできない
+
+* プロパティオブザーバはサブクラスの定義でスーパクラスの定義が上書きされ動作するわけではない
+* サブクラスのオブザーバもスーパークラスのオブザーバも順番に呼び出される
+
+```
+class Propa {
+	var attr = 0
+}
+
+class Propb : Propa {
+	override var attr : Int {
+		willSet{ print("B: will set") }
+		didSet{ print("B: did set") }
+	}
+}
+
+class PropGamma : PropB {
+	override var attr : Int {
+		willSet{ print("G: will set") }
+		didSet{ print("G: did set") }
+	}
+}
+```
+
+```
+var g = PropGanmma()
+g.attr = 1
+```
+
+```
+G: will set
+B: will set
+B: did set
+G: did set
+```
+
+### 継承をさせない指定
+
+* 継承をして機能の追加、変更をさせないためにはfinalという修飾語を用いる
+* キーワードstaticを使って定義するクラスのタイププロパティは、finakの宣言されたクラスプロパティと同じ扱いのよう
+	
+	
+	
+	
+
+
