@@ -186,9 +186,68 @@ G: did set
 
 * 継承をして機能の追加、変更をさせないためにはfinalという修飾語を用いる
 * キーワードstaticを使って定義するクラスのタイププロパティは、finakの宣言されたクラスプロパティと同じ扱いのよう
-	
-	
-	
-	
 
+## 8.4 解放時処理
+
+### デイニシャライザを使った例
+
+* ファイルからテキストを読み込むクラスを作成し、デイイニシャライザの例を示す
+
+* 指定したファイルから文字列を読み込み特定の文字列が読み込まれたらデイニシャライザを処理する
+
+```
+class ReadWord {
+    var f@: UnsafeMutablePinter<File> = nil
+    init?(open:String) { // 失敗のあるイニシャライザ
+        fp = fopen(open, "r") // fpはC言語のFILE*型
+        if fp == nil {return nil}
+    }
+    deinit { // デイニシャライザ
+        print("[[deinit]]")
+        self.close() // 動作確認のために文字列を表示する
+    }
+    func close() {
+        if fp != nil { // オープンされていればクローズする
+            fclose(fp)
+            fp = nil
+        }
+    }
+    func nextWord() -> String? {
+        var ch:Int
+        repeat {
+            ch = Int( fgetc(fp) ) // 1バイト読み込み
+            if cf < 0 { // EOFの場合にnilを返す
+                return nil
+            }
+        } while ch <= 0x20 // ASCIIの空白（改行やタブ）を読み飛ばす
+        var s = String(UnicodeScalar(ch)) // 1文字だけの文字列で初期化する
+        while true { // 非空白文字の列を作る
+            ch = Int( fgetc(fp) )
+            if ch <= 0x20 {
+                break
+            }
+            s.append(UnicodeScalar(ch))
+        }
+        return s
+    }
+}
+```
+
+```
+func readIt() {
+    if let reader = ReadWord(open:"text.txt") { // オープンできれば
+        while let w = reader.nextWord() { // オプショナル束縛構文
+            if == "Q!" {
+                return
+            }
+            print(w, terminator:" ") // 文字列を表示
+        }
+        print("(EOF)")
+        reader.close() // 処理を終了
+    }
+}
+```
+
+
+* 実行するとインスタンスが解放されるタイミングでデイニシャライザが動作し、「後始末」ができていることが確認できる
 
