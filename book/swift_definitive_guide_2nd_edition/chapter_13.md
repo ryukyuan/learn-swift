@@ -204,6 +204,89 @@ func reduce<U>(_: U, @noescape combine: (U, T) throws -> U) rethrows -> U
 * 引数のクロージャに@noescapeという属性がつけられているが、引数のクロージャが関数呼び出しの間しか使われていないことを表す
 * エラーを投げるクロージャを引数に指定する場合はtry演算子を使いエラーを補足する手段を用意する
 
+13.4 クロージャと強い参照の循環
+
+### 弱い参照による解決は？
+
+* クロージャの中でselfのインスタンスプロパティを参照するとselfがキャプチャされる
+* クラスの一部としてクロージャを使用する場合、インスタンスプロパティやselfに全くアクセスしないというのはありえない
+
+* 強い参照の循環を起こさないようにするには、クロージャがキャプチャする値が強い参照でなければよい
+
+```
+func meter(midnight:Bool) -> (Int -> Int) {
+    weak var wself : TaxiFare! = self
+    return { (var distance:Int) in
+        if (midnight) {
+            distance = Int(Doublie(distance) * 1.2)
+        }
+        var fare = wself.flagDown // selfではなくwselfを使う
+        distance -= wself.firstMeters
+        if (distance > 0) {
+            fare += (distance / wself.upMeters + 1) * wself.upCharge
+        }
+        return fare
+    }
+}
+```
+
+* selfをローカルな弱い参照の変数wselfに代入し、クロージャのなかではwselfを使う
+* インスタンスはメモリリークせずに解放できる
+
+
+### キャプチャリスト
+
+* クロージャでキャプチャする変数について、弱い参照の変数としてキャプチャする、あるいは非所有参照の変数としてキャプチャするように指定することができる
+* この指定を書き並べたものをキャプチャリストと呼ぶ
+
+* selfを非所有参照の変数としてキャプチャする記述
+```
+[unowned self]
+```
+
+* selfを弱い参照の変数としてキャプチャするにはweakを指定する
+* カンマで区切り複数指定する
+```
+[weak self, unowned obj]
+```
+
+* キャプチャリストを使ったクロージャ式
+```
+func meter(midnight:Bool) -> (Int -> Int) {
+    return { [unowned self] (var distance:Int) in
+        if (midnight) {
+            distance = Int(Doublie(distance) * 1.2)
+        }
+        var fare = self.flagDown
+        distance -= self.firstMeters
+        if (distance > 0) {
+            fare += (distance / self.upMeters + 1) * self.upCharge
+        }
+        return fare
+    }
+}
+```
+
+#### 非所有参照と弱い参照のどちらを使うべきか
+
+##### 弱い参照
+* 対象のインスタンスが解放された際に自動的にnikが代入される
+* クロージャ式内で開示支持やオプショナル束縛構文などを使用しなければならない
+
+##### 非所用参照
+* オーバーヘッドはなく、クロージャ式内の記述も容易
+* 対象のいsぬタンスが解放された場合に実行時エラーが発生する心配がある（nilが入ることは許容されないため）
+
+##### したがって
+
+* 変数が決してnilにならないことが分かっている場合はunownedの指定
+* nilになる可能性がある場合はweakの指定をすればよい
+
+#### キャプチャリストに含めるべき対象はselfだけではない
+
+* クロージャがキャプチャするインスタンスが、直接、間接的にクロージャを参照する可能性があれば、キャプチャリストに指定しておく必要がある
+
+
 
 
 
