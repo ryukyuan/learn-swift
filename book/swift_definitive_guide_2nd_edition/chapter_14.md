@@ -82,3 +82,47 @@ let t = p + q
 print(t) // ["番号": 1, "レベル": 60, "特技": 10]
 ```
 
+# 14.3 ジェネリクスによる型定義
+
+## 型パラメータを持つ構造体の定義
+
+* 構造体や列挙型クラスが型パラメータを持つように定義することができる
+* 同様に適合すべきプロトコルなどの条件をつけることができる
+
+```
+protocol VectorType { // 2次元ベクトル型
+  typealias Element // 付属型の宣言
+  var x : Element { get set }
+  var y : Element { get set }
+}
+```
+
+* プロトコルVectorTypeを採用する構造体Vectorを、Elementを型パラメータで決められるように定義する
+
+```
+struct Vector<T> : VectorType {
+  typealias Element = T // 付属型をパラメータで指定された型で定義
+  var x, y: Element // 格納型プロパティ
+}
+```
+
+* 定義を使った動作例を示す
+
+```
+let a: Vector<Int> = Vector<Int>(x:12, y:3)
+print(a.x, a.y) // 12 3 を表示
+let b = Vector<[String]>(x:[], i:["黒", "noir", "schwarz"]) // 使用可能
+```
+
+* 付属型はジェネリクス機能を使う上で不可欠の要素
+
+## ジェネリックなデータ型と型パラメータの推論
+
+* 周囲の状況から用意に推論ｄきるときはジェネリック型の型パラメータを省略できることがある
+
+```
+let p = Vecotr(x:10.0, y:2.0/2.5).y // p = 0.8 (Double)
+```
+
+* 型の誤りを防止するためにも、通常は型パラメータを明示的に指定すべきでである
+
