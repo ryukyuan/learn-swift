@@ -126,3 +126,55 @@ let p = Vecotr(x:10.0, y:2.0/2.5).y // p = 0.8 (Double)
 
 * 型の誤りを防止するためにも、通常は型パラメータを明示的に指定すべきでである
 
+### プロトコルSequnenceTypeを調べよう
+
+* ひとまとまりのインスタンスを管理する機能をまとめたプロトコル
+* 範囲型や配列などがこのプロトコルに適合している
+
+```
+protocol SequenceType {
+  typealias Generator : GeneratorType // 付属型
+  typealias SubSequence // 付属型
+  func generate() -> Self.Generator
+  func map<T>(transform:
+      (Self.Generator.Element) throws -> T) rethrows -> [T]
+  func filter(includeElement:
+      (Self.Generator.Element) throws -> Bool) rethrows
+      -> [Self.Generator.Element]
+  func prefix(maxLength: Int) -> Self.SubSequence
+  func suffix(maxLength: Int) -> Self.SubSequence
+  // 以下、関数定義をいくつか省略
+}
+
+protocol GeneratorType {
+  typealias Element // 付属型
+  mutating func next() -> Self.Element?
+}
+```
+
+* プロトコルSequenceTypeのメソッドgenerate()はプロトコルGeneratorTypeに適合したインスタンスを返する
+* プロトコルGeneratorTypeはインスタンスの集まりの具体的な管理方法をプロトコルSequenceTypeから切り離したもの
+* プロトコルSequenceType自体には要素のインスタンスが何型なのかという情報がない
+* プロトコルGeneratorTypeの付属型のElementが要素の型である
+
+* プロトコルSequenceTypeはまた、SubSequneceという付属型を持つ
+* さまざまな操作の結果として部分集合を作成する場合にSelfの代わりにSubSequence型のインスタンスを返す
+
+```
+extension SequenceType where Self.Generator.Element : Comparable {
+  func sort() -> [Self.Generator.Element]
+}
+
+extension SequenceType where Self.Generator.Element : Equatable {
+  func contains(element: Self.Generator.Element) -> Bool
+}
+
+extension SequenceType where Self.Generator.Element == String {
+  func joinWithSeparator(separator: String) -> String
+}
+```
+
+* １つめ：プロトコルComparableに適合している拡張定義の条件。相互に大小比較が可能なので並び替えを行うメソッドsort()が利用可能であるように宣言
+* ２つめ：プロトコルEquatableに適合している拡張定義の条件。指定したものと同じ要素が存在するかを調べるメソッドcontains(_:)が利用可能であるように宣言
+* ３つめ：要素がString型であることが拡張定義の条件。引数で指定した文字列を区切りにして、すべての要素を連結して返すメソッドを宣言
+
